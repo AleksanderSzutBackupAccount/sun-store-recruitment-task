@@ -30,7 +30,7 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: laravel-app
+          service: backend
           image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/backend/backend
           region: ${{ secrets.GCP_REGION }}
           allow-unauthenticated: true
