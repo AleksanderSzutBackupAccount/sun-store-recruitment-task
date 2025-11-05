@@ -23,14 +23,14 @@ jobs:
 
       - name: Build and Push image
         run: |
-          IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/laravel-repo/laravel-app"
-          docker build -t $IMAGE .
+          IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/backend/backend"
+          docker build -f deployment/Dockerfile -t $IMAGE .
           docker push $IMAGE
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: laravel-app
-          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/laravel-repo/laravel-app
+          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/backend/backend
           region: ${{ secrets.GCP_REGION }}
           allow-unauthenticated: true
