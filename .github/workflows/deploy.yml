@@ -21,6 +21,9 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
 
+      - name: Fetch env from secret manager
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+
       - name: Build and Push image
         run: |
           IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/backend/backend"

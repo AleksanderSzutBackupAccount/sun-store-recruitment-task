@@ -14,9 +14,10 @@ COPY --from=vendor /app/vendor ./vendor
 
 COPY ./deployment/nginx.conf /etc/nginx/nginx.conf
 COPY ./deployment/supervisord.conf /etc/supervisord.conf
+COPY ./deployment/entrypoint.sh /etc/entrypoint.sh
 
 RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
 
-
 EXPOSE 8080
+
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
