@@ -72,6 +72,7 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+          --default-authentication-plugin=mysql_native_password
 
     steps:
       - uses: actions/checkout@v4
@@ -91,6 +92,13 @@ jobs:
         with:
           php-version: 8.3
           extensions: mbstring, bcmath, pdo_mysql
+
+      - name: Wait for MySQL
+        run: |
+          until mysqladmin ping -hmysql -uroot -proot --silent; do
+            echo "⏳ Waiting for MySQL to be ready..."
+            sleep 2
+          done
 
       - name: Run migrations
         run: php artisan migrate --force
