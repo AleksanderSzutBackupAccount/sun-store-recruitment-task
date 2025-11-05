@@ -52,7 +52,7 @@ jobs:
           path: vendor
 
       - name: Run Laravel Pint
-        run: ./vendor/bin/pint --test
+        run: php ./vendor/bin/pint --test
 
   tests:
     name: tests
@@ -85,34 +85,18 @@ jobs:
       - name: Copy test environment
         run: cp .env.tests .env
 
-      - name: Build and start Sail
-        run: |
-          ./vendor/bin/sail build --no-cache
-          ./vendor/bin/sail up -d
-
-      - name: Wait for MySQL to be ready
-        run: |
-          until docker exec $(docker ps --filter "name=mysql" -q) mysqladmin ping -h "mysql" --silent; do
-            echo "Waiting for database connection..."
-            sleep 3
-          done
-
-      - name: Run tests
-        run: ./vendor/bin/sail test --stop-on-failure
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: mysql
-          DB_PORT: 3306
-          DB_DATABASE: testing
-          DB_USERNAME: root
-          DB_PASSWORD: root
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
+      # best practice is running test in prod container
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          name: test-results
-          path: storage/logs/
+          php-version: 8.3
+          extensions: mbstring, bcmath, pdo_mysql
+
+      - name: Run migrations
+        run: php artisan migrate --force
+
+      - name: Run Tests
+        run: php artisan test
 
   summary:
     name: CI Summary
