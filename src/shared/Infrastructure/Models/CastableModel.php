@@ -10,7 +10,7 @@ use Src\Shared\Infrastructure\Casts\ModelCasts;
 abstract class CastableModel extends Model
 {
     /**
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $attributes
      */
     public function __construct(array $attributes = [])
     {

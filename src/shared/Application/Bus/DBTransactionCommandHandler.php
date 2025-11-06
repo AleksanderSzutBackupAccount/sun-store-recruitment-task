@@ -9,9 +9,7 @@ use Src\Shared\Domain\Bus\CommandInterface;
 
 readonly class DBTransactionCommandHandler implements DBTransactionCommandHandlerInterface
 {
-    public function __construct(private Dispatcher $dispatcher)
-    {
-    }
+    public function __construct(private Dispatcher $dispatcher) {}
 
     public function handle(CommandInterface $commands): void
     {
