@@ -92,18 +92,27 @@ jobs:
           php-version: 8.3
           extensions: mbstring, bcmath, pdo_mysql
 
-      - name: Wait for MySQL
+      - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -hmysql -uroot -proot --silent; do
-            echo "⏳ Waiting for MySQL to be ready..."
-            sleep 2
+          export MYSQL_PWD=root
+          echo "⏳ Waiting for MySQL..."
+          for i in {1..20}; do
+            if mysql -hmysql -uroot -proot -e "SELECT 1;" >/dev/null 2>&1; then
+              echo "✅ MySQL is ready!"
+              break
+            fi
+            echo "Waiting ($i/20)..."
+            sleep 3
           done
+      - name: Show MySQL status
+        run: |
+          docker ps -a
+          docker logs $(docker ps -aqf "ancestor=mysql:8.0")
+          - name: Run migrations
+            run: php artisan migrate --force
 
-      - name: Run migrations
-        run: php artisan migrate --force
-
-      - name: Run Tests
-        run: php artisan test
+          - name: Run Tests
+            run: php artisan test
 
   summary:
     name: CI Summary
