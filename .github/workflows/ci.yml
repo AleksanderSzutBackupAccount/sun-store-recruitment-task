@@ -82,8 +82,10 @@ jobs:
           name: vendor
           path: vendor
 
-      - name: Copy test environment
-        run: cp .env.tests .env
+      - name: Prepare test environment
+        run: |
+          cp .env.tests .env
+          php artisan key:generate
 
       # best practice is running test in prod container
       - name: Setup PHP
