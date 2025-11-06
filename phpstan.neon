@@ -1,0 +1,27 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+parameters:
+    ignoreErrors:
+        - '#^Cannot cast mixed to string#'
+        - '#^Cannot cast mixed to int#'
+        - '#^Cannot cast mixed to float#'
+        - '#Call to function is_subclass_of\(\) with class-string<.*> and .* will always evaluate to (true).#'
+
+    noUnnecessaryCollectionCall: false
+    reportUnmatchedIgnoredErrors: false
+    level: max
+    paths:
+        - app
+        - src
+    excludePaths:
+        - **/tests/*
+        - */tests/*
+        - tests/*
+        - src/**/*Test.php
+    #editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
+    earlyTerminatingMethodCalls:
+        Illuminate\Contracts\Foundation\Application:
+            - abort
+    universalObjectCratesClasses:
+        - Illuminate\Database\Eloquent\Relations\Pivot

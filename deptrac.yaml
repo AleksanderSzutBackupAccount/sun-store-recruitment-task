@@ -1,0 +1,57 @@
+deptrac:
+  paths:
+    - ./src
+  exclude_files:
+    - '#.*test.*#'
+    - '#.*Test.*#'
+  layers:
+    - name: Domain
+      collectors:
+        - type: directory
+          value: .*/Domain/
+    - name: Infrastructure
+      collectors:
+        - type: directory
+          value: .*/Infrastructure/
+    - name: Application
+      collectors:
+        - type: directory
+          value: .*/Application/
+    - name: TestsNotAllowed
+      collectors:
+        - type: directory
+          value: .*/test/
+    - name: TestsNotAllowedType
+      collectors:
+        - type: directory
+          value: .*/Tests/Units
+        - type: directory
+          value: .*/Tests/Features
+    - name: UI
+      collectors:
+        - type: directory
+          value: .*/UI/
+    - name: Laravel
+      collectors:
+        - type: composer
+          composerPath: composer.json
+          composerLockPath: composer.lock
+          packages:
+            - laravel/framework
+  ruleset:
+    UI:
+      - Domain
+      - Application
+      - Infrastructure
+      - Laravel
+    Application:
+      - Domain
+      - Application
+      - Infrastructure
+      - Laravel
+    Domain:
+      - Domain
+    Infrastructure:
+      - Domain
+      - Application
+      - Laravel
