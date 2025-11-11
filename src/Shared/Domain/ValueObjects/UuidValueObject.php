@@ -33,7 +33,7 @@ abstract readonly class UuidValueObject implements ComparableInterface, Stringab
         }
     }
 
-    final public static function random(): self
+    final public static function generate(): static
     {
         return new static(Uuid::uuid4()->toString());
     }

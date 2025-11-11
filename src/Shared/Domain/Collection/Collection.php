@@ -49,6 +49,14 @@ abstract class Collection implements Countable, IteratorAggregate
     }
 
     /**
+     * @param  T  ...$items
+     */
+    final public static function new(...$items): static
+    {
+        return new static($items);
+    }
+
+    /**
      * @return T|null
      */
     final public function first(): ?object
