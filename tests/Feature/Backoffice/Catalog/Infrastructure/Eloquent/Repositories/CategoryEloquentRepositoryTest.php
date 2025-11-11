@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Backoffice\Catalog\Infrastructure\Eloquent\Repositories;
+namespace Tests\Backoffice\Catalog\Infrastructure\Eloquent\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -39,7 +39,8 @@ class CategoryEloquentRepositoryTest extends TestCase
                 new CategoryAttribute(
                     CategoryAttributeId::generate(),
                     $this->faker->word,
-                    CategoryAttributeType::STRING
+                    CategoryAttributeType::STRING,
+                    'kg'
                 )
             )
         );
@@ -57,7 +58,7 @@ class CategoryEloquentRepositoryTest extends TestCase
         $model->refresh();
 
         $entity = $model->toEntity();
-        $entity->attributes->push(new CategoryAttribute(CategoryAttributeId::generate(), $this->faker->name, CategoryAttributeType::STRING));
+        $entity->attributes->push(new CategoryAttribute(CategoryAttributeId::generate(), $this->faker->name, CategoryAttributeType::STRING, 'kg'));
 
         $this->repository->save($entity);
 

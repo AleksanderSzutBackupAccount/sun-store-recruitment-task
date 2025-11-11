@@ -46,13 +46,13 @@ class CategoryEloquentModel extends CastableModel
         return $this->hasMany(CategoryAttributeEloquentModel::class, 'category_id', 'id');
     }
 
-//    /**
-//     * @return HasMany<ProductEloquentModel, $this>
-//     */
-//    public function products(): HasMany
-//    {
-//        return $this->hasMany(ProductEloquentModel::class);
-//    }
+    //    /**
+    //     * @return HasMany<ProductEloquentModel, $this>
+    //     */
+    //    public function products(): HasMany
+    //    {
+    //        return $this->hasMany(ProductEloquentModel::class);
+    //    }
 
     protected static function newFactory(): CategoryEloquentFactory
     {
