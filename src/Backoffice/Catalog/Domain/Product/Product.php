@@ -18,4 +18,23 @@ class Product extends AggregateRoot
         public ProductAttributeCollection $attributes
     ) {}
 
+    public static function create(
+        ProductId $id,
+        ProductBaseInfo $information,
+        Category $category,
+        Money $price,
+        ProductAttributeCollection $attributes
+    ): self {
+        $entity = new self(
+            $id,
+            $information,
+            $category,
+            $price,
+            $attributes
+        );
+
+        $entity->record(new ProductCreated($id));
+
+        return $entity;
+    }
 }

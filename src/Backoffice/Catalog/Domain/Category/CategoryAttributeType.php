@@ -18,4 +18,23 @@ enum CategoryAttributeType: string
     case FLOAT = 'float';
     case BOOL = 'bool';
 
+    public function isInt(): bool
+    {
+        return $this === self::INT;
+    }
+
+    public function isString(): bool
+    {
+        return $this === self::STRING;
+    }
+
+    public function isFloat(): bool
+    {
+        return $this === self::FLOAT;
+    }
+
+    public function isBool(): bool
+    {
+        return $this === self::BOOL;
+    }
 }

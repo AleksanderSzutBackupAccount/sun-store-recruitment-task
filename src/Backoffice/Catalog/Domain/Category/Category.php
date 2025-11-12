@@ -38,7 +38,7 @@ final class Category extends AggregateRoot
     ): Product {
         $productAttributes = $this->createAttributes($attributes);
 
-        return new Product(
+        return Product::create(
             $id,
             $info,
             $this,
@@ -47,6 +47,9 @@ final class Category extends AggregateRoot
         );
     }
 
+    /**
+     * @param  array<string, mixed>  $givenAttributes
+     */
     private function createAttributes(array $givenAttributes): ProductAttributeCollection
     {
         $productAttributes = ProductAttributeCollection::new();
@@ -60,15 +63,15 @@ final class Category extends AggregateRoot
 
             $value = $givenAttributes[$name];
 
-            if ($expectedAttr->type === 'numeric' && ! is_numeric($value)) {
+            if ($expectedAttr->type->isInt() && ! is_numeric($value)) {
                 throw new DomainException("Attribute {$name} must be numeric");
             }
 
-            if ($expectedAttr->type === 'string' && ! is_string($value)) {
+            if ($expectedAttr->type->isString() && ! is_string($value)) {
                 throw new DomainException("Attribute {$name} must be string");
             }
 
-            if ($expectedAttr->type === 'boolean' && ! is_bool($value)) {
+            if ($expectedAttr->type->isFloat() && ! is_bool($value)) {
                 throw new DomainException("Attribute {$name} must be boolean");
             }
             $productAttributes->push(new ProductAttribute(ProductAttributeId::generate(), $name, (string) $value));
