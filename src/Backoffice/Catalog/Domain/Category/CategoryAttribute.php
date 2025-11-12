@@ -10,10 +10,10 @@ final readonly class CategoryAttribute
         public CategoryAttributeId $id,
         public string $name,
         public CategoryAttributeType $type,
-        public string $unit,
+        public ?string $unit,
     ) {}
 
-    public static function create(CategoryAttributeId $id, string $name, CategoryAttributeType $type, string $unit): self
+    public static function create(CategoryAttributeId $id, string $name, CategoryAttributeType $type, ?string $unit): self
     {
         return new CategoryAttribute(
             $id,

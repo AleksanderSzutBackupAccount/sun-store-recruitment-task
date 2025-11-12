@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Src\Backoffice\Catalog\Infrastructure\Eloquent\Repositories;
 
 use Src\Backoffice\Catalog\Domain\Category\Category;
+use Src\Backoffice\Catalog\Domain\Category\CategoryCollection;
 use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryRepositoryInterface;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryAttributeEloquentModel;
@@ -39,5 +40,13 @@ final readonly class CategoryEloquentRepository implements CategoryRepositoryInt
         $model = CategoryEloquentModel::with('categoryAttributes')->find($id);
 
         return $model?->toEntity();
+    }
+
+    public function all(): CategoryCollection
+    {
+        /** @var Category[] $categories */
+        $categories = CategoryEloquentModel::all()->map(static fn (CategoryEloquentModel $model) => $model->toEntity())->toArray();
+
+        return new CategoryCollection($categories);
     }
 }

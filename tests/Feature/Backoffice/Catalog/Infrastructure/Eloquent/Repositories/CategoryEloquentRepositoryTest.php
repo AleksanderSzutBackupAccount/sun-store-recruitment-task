@@ -8,8 +8,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttribute;
+use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeCollection;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeId;
-use Src\Backoffice\Catalog\Domain\Category\CategoryAttributes;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeType;
 use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
@@ -35,7 +35,7 @@ class CategoryEloquentRepositoryTest extends TestCase
         $category = Category::create(
             CategoryId::generate(),
             new CategoryName($this->faker->name),
-            CategoryAttributes::new(
+            CategoryAttributeCollection::new(
                 new CategoryAttribute(
                     CategoryAttributeId::generate(),
                     $this->faker->word,

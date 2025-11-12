@@ -9,4 +9,6 @@ interface CategoryRepositoryInterface
     public function save(Category $category): void;
 
     public function find(CategoryId $id): ?Category;
+
+    public function all(): CategoryCollection;
 }

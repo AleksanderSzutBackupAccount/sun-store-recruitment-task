@@ -6,8 +6,8 @@ namespace Src\Backoffice\Catalog\Application\UseCases\CreateCategory;
 
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttribute;
+use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeCollection;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeId;
-use Src\Backoffice\Catalog\Domain\Category\CategoryAttributes;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeType;
 use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
@@ -42,9 +42,9 @@ final readonly class CategoryCreator
      * /**
      * @param  array{name: string, type: string, unit: string}[]  $attributesDefinition
      */
-    public function createAttributes(array $attributesDefinition): CategoryAttributes
+    private function createAttributes(array $attributesDefinition): CategoryAttributeCollection
     {
-        $attributes = new CategoryAttributes([]);
+        $attributes = new CategoryAttributeCollection([]);
 
         foreach ($attributesDefinition as $attribute) {
             $attributes->push(

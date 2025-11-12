@@ -9,10 +9,15 @@ use Src\Shared\Domain\Collection\Collection;
 /**
  * @extends Collection<CategoryAttribute>
  */
-class CategoryAttributes extends Collection
+class CategoryAttributeCollection extends Collection
 {
     protected function type(): string
     {
         return CategoryAttribute::class;
+    }
+
+    public function findByName(string $name): ?CategoryAttribute
+    {
+        return $this->find(static fn (CategoryAttribute $item) => $name === $item->name);
     }
 }

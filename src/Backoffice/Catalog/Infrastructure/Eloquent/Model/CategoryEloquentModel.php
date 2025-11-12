@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttribute;
-use Src\Backoffice\Catalog\Domain\Category\CategoryAttributes;
+use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeCollection;
 use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Factories\CategoryEloquentFactory;
@@ -46,13 +46,13 @@ class CategoryEloquentModel extends CastableModel
         return $this->hasMany(CategoryAttributeEloquentModel::class, 'category_id', 'id');
     }
 
-    //    /**
-    //     * @return HasMany<ProductEloquentModel, $this>
-    //     */
-    //    public function products(): HasMany
-    //    {
-    //        return $this->hasMany(ProductEloquentModel::class);
-    //    }
+    /**
+     * @return HasMany<ProductEloquentModel, $this>
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(ProductEloquentModel::class);
+    }
 
     protected static function newFactory(): CategoryEloquentFactory
     {
@@ -68,7 +68,7 @@ class CategoryEloquentModel extends CastableModel
         return new Category(
             $this->id,
             $this->name,
-            new CategoryAttributes(
+            new CategoryAttributeCollection(
                 $attributes
             )
         );

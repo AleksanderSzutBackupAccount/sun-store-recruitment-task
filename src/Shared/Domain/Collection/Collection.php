@@ -78,8 +78,10 @@ abstract class Collection implements Countable, IteratorAggregate
     }
 
     /**
-     * @param  callable(T): mixed  $closure
-     * @return mixed[]
+     * @template R as mixed
+     *
+     * @param  callable(T): R  $closure
+     * @return R[]
      */
     final public function map(callable $closure): array
     {
