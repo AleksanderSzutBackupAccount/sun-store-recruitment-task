@@ -142,6 +142,9 @@ return [
     |
     */
 
+    'elastic' => [
+        'hosts' => explode(',', env('ELASTIC_HOSTS', 'localhost:9200')),
+    ],
     'redis' => [
 
         'client' => env('REDIS_CLIENT', 'phpredis'),

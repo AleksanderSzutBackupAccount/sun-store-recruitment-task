@@ -10,5 +10,7 @@ interface CategoryRepositoryInterface
 
     public function find(CategoryId $id): ?Category;
 
+    public function findByName(CategoryName $name): ?Category;
+
     public function all(): CategoryCollection;
 }

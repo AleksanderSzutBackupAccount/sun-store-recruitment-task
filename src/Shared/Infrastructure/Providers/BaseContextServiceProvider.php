@@ -46,11 +46,11 @@ abstract class BaseContextServiceProvider extends ServiceProvider
     {
         $this->registerProviders();
         $this->registerCommands();
+        $this->bootBinds();
     }
 
     public function boot(): void
     {
-        $this->bootBinds();
         $this->bootUseCases();
         $this->bootRouteBinds();
         $this->bootPolicies();

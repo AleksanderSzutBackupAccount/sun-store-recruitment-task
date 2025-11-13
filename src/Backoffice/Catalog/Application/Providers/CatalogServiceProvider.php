@@ -14,6 +14,7 @@ use Src\Backoffice\Catalog\Infrastructure\Eloquent\Repositories\CategoryEloquent
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Repositories\ProductEloquentRepository;
 use Src\Backoffice\Catalog\UI\Console\CreateCategoryCommand;
 use Src\Backoffice\Catalog\UI\Console\CreateProductCommand;
+use Src\Backoffice\Catalog\UI\Console\ImportProductsCommand;
 use Src\Shared\Infrastructure\Providers\BaseContextServiceProvider;
 
 class CatalogServiceProvider extends BaseContextServiceProvider
@@ -26,6 +27,7 @@ class CatalogServiceProvider extends BaseContextServiceProvider
     protected array $commands = [
         CreateCategoryCommand::class,
         CreateProductCommand::class,
+        ImportProductsCommand::class,
     ];
 
     protected array $useCases = [

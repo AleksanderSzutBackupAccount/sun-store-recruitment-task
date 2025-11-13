@@ -20,6 +20,8 @@ class ProductEloquentModel extends CastableModel
 
     protected $table = 'products';
 
+    protected $with = ['category', 'attributes'];
+
     protected $fillable = [
         'id', 'category_id', 'name', 'description', 'manufacturer', 'price',
     ];
@@ -29,7 +31,7 @@ class ProductEloquentModel extends CastableModel
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(CategoryEloquentModel::class);
+        return $this->belongsTo(CategoryEloquentModel::class, 'category_id', 'id');
     }
 
     /**
@@ -37,7 +39,7 @@ class ProductEloquentModel extends CastableModel
      */
     public function attributes(): HasMany
     {
-        return $this->hasMany(ProductAttributeEloquentModel::class);
+        return $this->hasMany(ProductAttributeEloquentModel::class, 'product_id', 'id');
     }
 
     protected static function newFactory(): ProductEloquentFactory
