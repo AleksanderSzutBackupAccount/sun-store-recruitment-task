@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Src\Backoffice\Catalog\Domain\Category;
 
+use Src\Shared\Domain\CategoryId;
+
 interface CategoryRepositoryInterface
 {
     public function save(Category $category): void;

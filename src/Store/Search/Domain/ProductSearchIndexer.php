@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Src\Store\Search\Domain;
 
-use Src\Backoffice\Catalog\Domain\Product\ProductId;
+use Src\Shared\Domain\ProductId;
 
 interface ProductSearchIndexer
 {
-    public function index(ProductId $id, array $data);
+    public function index(Product $product);
 
     public function delete(ProductId $id);
 }

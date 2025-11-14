@@ -3,10 +3,11 @@
 namespace Src\Store\Search\UI\Console;
 
 use Illuminate\Console\Command;
-use Src\Backoffice\Catalog\Domain\Product\ProductId;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\ProductAttributeEloquentModel;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\ProductEloquentModel;
+use Src\Shared\Domain\ProductId;
 use Src\Shared\Infrastructure\Elastic\ElasticClient;
+use Src\Store\Search\Domain\Product;
 use Src\Store\Search\Domain\ProductSearchIndexer;
 
 class ReindexProductCommand extends Command
@@ -38,15 +39,16 @@ class ReindexProductCommand extends Command
                 $mappedAttributes[$attribute->categoryAttribute->name] = $attribute->value;
             }
             /** @var ProductEloquentModel $product */
-            $indexer->index(new ProductId($product->id),
-                [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'category' => $product->category->name->value,
-                    'price' => $product->price,
-                    'description' => $product->description,
-                    'attributes' => $mappedAttributes,
-                ]
+            $indexer->index(
+                new Product(
+                    id: new ProductId($product->id),
+                    name: $product->name,
+                    description: $product->description,
+                    manufacture: $product->manufacture,
+                    category: $product->category->name->value,
+                    price: $product->price,
+                    attributes: $mappedAttributes
+                )
             );
         }
     }

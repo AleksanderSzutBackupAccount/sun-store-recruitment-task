@@ -9,6 +9,6 @@ use Src\Shared\Domain\Bus\DomainEvent;
 readonly class ProductCreated implements DomainEvent
 {
     public function __construct(
-        public ProductId $id
+        public Product $entity
     ) {}
 }

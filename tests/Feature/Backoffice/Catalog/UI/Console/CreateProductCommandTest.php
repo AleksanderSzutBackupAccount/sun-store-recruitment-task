@@ -6,10 +6,10 @@ namespace Tests\Feature\Backoffice\Catalog\UI\Console;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Product\ProductCreated;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryEloquentModel;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\ProductEloquentModel;
+use Src\Shared\Domain\CategoryId;
 use Tests\TestCase;
 
 final class CreateProductCommandTest extends TestCase

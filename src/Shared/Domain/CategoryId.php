@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Src\Backoffice\Catalog\Domain\Category;
+namespace Src\Shared\Domain;
 
 use Src\Shared\Domain\ValueObjects\UuidValueObject;
 

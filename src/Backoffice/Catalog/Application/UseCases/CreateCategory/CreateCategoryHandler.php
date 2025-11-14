@@ -2,8 +2,8 @@
 
 namespace Src\Backoffice\Catalog\Application\UseCases\CreateCategory;
 
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
+use Src\Shared\Domain\CategoryId;
 
 final readonly class CreateCategoryHandler
 {

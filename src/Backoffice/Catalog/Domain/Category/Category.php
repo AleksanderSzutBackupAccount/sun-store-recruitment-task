@@ -10,8 +10,9 @@ use Src\Backoffice\Catalog\Domain\Product\ProductAttribute;
 use Src\Backoffice\Catalog\Domain\Product\ProductAttributeCollection;
 use Src\Backoffice\Catalog\Domain\Product\ProductAttributeId;
 use Src\Backoffice\Catalog\Domain\Product\ProductBaseInfo;
-use Src\Backoffice\Catalog\Domain\Product\ProductId;
 use Src\Shared\Domain\Aggregate\AggregateRoot;
+use Src\Shared\Domain\CategoryId;
+use Src\Shared\Domain\ProductId;
 use Src\Shared\Domain\ValueObjects\Money;
 
 final class Category extends AggregateRoot

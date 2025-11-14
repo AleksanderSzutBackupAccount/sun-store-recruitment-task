@@ -23,6 +23,10 @@ class StoreSearchServiceProvider extends BaseContextServiceProvider
         ReindexProductCommand::class,
     ];
 
+    protected array $providers = [
+        EventSearchServiceProvider::class
+    ];
+
     protected array $useCases = [
     ];
 

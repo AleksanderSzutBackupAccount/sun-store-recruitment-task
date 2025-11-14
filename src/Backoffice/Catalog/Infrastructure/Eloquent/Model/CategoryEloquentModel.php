@@ -11,9 +11,9 @@ use Illuminate\Support\Collection;
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttribute;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeCollection;
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Factories\CategoryEloquentFactory;
+use Src\Shared\Domain\CategoryId;
 use Src\Shared\Infrastructure\Models\CastableModel;
 
 /**

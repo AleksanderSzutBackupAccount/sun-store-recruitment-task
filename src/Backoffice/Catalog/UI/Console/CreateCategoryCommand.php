@@ -7,8 +7,8 @@ namespace Src\Backoffice\Catalog\UI\Console;
 use Illuminate\Console\Command;
 use Src\Backoffice\Catalog\Application\UseCases\CreateCategory\CreateCategory;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeType;
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Shared\Application\Bus\CommandHandlerInterface;
+use Src\Shared\Domain\CategoryId;
 
 final class CreateCategoryCommand extends Command
 {

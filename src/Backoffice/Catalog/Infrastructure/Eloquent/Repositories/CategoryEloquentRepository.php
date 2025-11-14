@@ -6,11 +6,11 @@ namespace Src\Backoffice\Catalog\Infrastructure\Eloquent\Repositories;
 
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Backoffice\Catalog\Domain\Category\CategoryCollection;
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
 use Src\Backoffice\Catalog\Domain\Category\CategoryRepositoryInterface;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryAttributeEloquentModel;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryEloquentModel;
+use Src\Shared\Domain\CategoryId;
 
 final readonly class CategoryEloquentRepository implements CategoryRepositoryInterface
 {

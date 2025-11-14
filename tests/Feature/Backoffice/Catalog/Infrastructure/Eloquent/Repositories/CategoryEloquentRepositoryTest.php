@@ -11,11 +11,11 @@ use Src\Backoffice\Catalog\Domain\Category\CategoryAttribute;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeCollection;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeType;
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryAttributeEloquentModel;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryEloquentModel;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Repositories\CategoryEloquentRepository;
+use Src\Shared\Domain\CategoryId;
 use Tests\TestCase;
 
 class CategoryEloquentRepositoryTest extends TestCase

@@ -16,4 +16,6 @@ final class SharedServiceProvider extends BaseContextServiceProvider
         EventBusInterface::class => EventBusLaravel::class,
         CommandHandlerInterface::class => CommandHandler::class,
     ];
+
+    protected array $providers = [EventSharedServiceProvider::class];
 }

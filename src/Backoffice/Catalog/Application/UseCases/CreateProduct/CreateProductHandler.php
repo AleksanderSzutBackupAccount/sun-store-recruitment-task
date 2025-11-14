@@ -2,9 +2,9 @@
 
 namespace Src\Backoffice\Catalog\Application\UseCases\CreateProduct;
 
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Product\ProductBaseInfo;
-use Src\Backoffice\Catalog\Domain\Product\ProductId;
+use Src\Shared\Domain\CategoryId;
+use Src\Shared\Domain\ProductId;
 use Src\Shared\Domain\ValueObjects\Money;
 
 final readonly class CreateProductHandler

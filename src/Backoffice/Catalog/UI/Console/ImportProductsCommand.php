@@ -9,11 +9,11 @@ use Src\Backoffice\Catalog\Application\UseCases\CreateCategory\CreateCategory;
 use Src\Backoffice\Catalog\Application\UseCases\CreateProduct\CreateProduct;
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttributeType;
-use Src\Backoffice\Catalog\Domain\Category\CategoryId;
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;
 use Src\Backoffice\Catalog\Domain\Category\CategoryRepositoryInterface;
-use Src\Backoffice\Catalog\Domain\Product\ProductId;
 use Src\Shared\Application\Bus\CommandHandlerInterface;
+use Src\Shared\Domain\CategoryId;
+use Src\Shared\Domain\ProductId;
 
 final class ImportProductsCommand extends Command
 {

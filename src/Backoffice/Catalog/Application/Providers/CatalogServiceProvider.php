@@ -16,6 +16,7 @@ use Src\Backoffice\Catalog\UI\Console\CreateCategoryCommand;
 use Src\Backoffice\Catalog\UI\Console\CreateProductCommand;
 use Src\Backoffice\Catalog\UI\Console\ImportProductsCommand;
 use Src\Shared\Infrastructure\Providers\BaseContextServiceProvider;
+use Src\Store\Search\Application\Providers\EventSearchServiceProvider;
 
 class CatalogServiceProvider extends BaseContextServiceProvider
 {
@@ -30,6 +31,9 @@ class CatalogServiceProvider extends BaseContextServiceProvider
         ImportProductsCommand::class,
     ];
 
+    protected array $providers = [
+        EventSearchServiceProvider::class
+    ];
     protected array $useCases = [
         CreateCategory::class => CreateCategoryHandler::class,
         CreateProduct::class => CreateProductHandler::class,

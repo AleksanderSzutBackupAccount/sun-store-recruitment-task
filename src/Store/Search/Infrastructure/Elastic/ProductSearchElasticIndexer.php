@@ -4,32 +4,29 @@ declare(strict_types=1);
 
 namespace Src\Store\Search\Infrastructure\Elastic;
 
-use Src\Backoffice\Catalog\Domain\Product\ProductId;
+use Src\Shared\Domain\ProductId;
 use Src\Shared\Infrastructure\Elastic\ElasticClient;
+use Src\Store\Search\Domain\Product;
 use Src\Store\Search\Domain\ProductSearchIndexer;
 
-class ProductSearchElasticIndexer implements ProductSearchIndexer
+readonly class ProductSearchElasticIndexer implements ProductSearchIndexer
 {
     private const string ELASTIC_PRODUCT_INDEX = 'products';
 
     public function __construct(
-        private ElasticClient $elasticClient
+        private  ElasticClient $elasticClient
     ) {}
 
-    public function index(ProductId $id, array $data)
+    public function index(Product $product)
     {
-        return $this->elasticClient->index(self::ELASTIC_PRODUCT_INDEX, $id->value, $data);
+        return $this->elasticClient->index(self::ELASTIC_PRODUCT_INDEX, $product->id->value, $product->toIndex());
     }
 
-    public function update(ProductId $id, array $data)
+    public function update(Product $product): void
     {
-        return $this->elasticClient->update(self::ELASTIC_PRODUCT_INDEX,
-            $id->value, $data);
-    }
-
-    public function deleteIndex()
-    {
-        $this->elasticClient->deleteIndex(self::ELASTIC_PRODUCT_INDEX);
+         $this->elasticClient->update(self::ELASTIC_PRODUCT_INDEX,
+            $product->id->value,
+        $product->toIndex());
     }
 
     public function delete(ProductId $id)

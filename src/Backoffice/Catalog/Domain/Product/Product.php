@@ -6,6 +6,7 @@ namespace Src\Backoffice\Catalog\Domain\Product;
 
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Shared\Domain\Aggregate\AggregateRoot;
+use Src\Shared\Domain\ProductId;
 use Src\Shared\Domain\ValueObjects\Money;
 
 class Product extends AggregateRoot
@@ -33,7 +34,7 @@ class Product extends AggregateRoot
             $attributes
         );
 
-        $entity->record(new ProductCreated($id));
+        $entity->record(new ProductCreated($entity));
 
         return $entity;
     }

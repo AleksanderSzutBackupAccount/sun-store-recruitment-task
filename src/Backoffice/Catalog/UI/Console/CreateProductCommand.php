@@ -8,8 +8,8 @@ use Illuminate\Console\Command;
 use Src\Backoffice\Catalog\Application\UseCases\CreateProduct\CreateProduct;
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Backoffice\Catalog\Domain\Category\CategoryRepositoryInterface;
-use Src\Backoffice\Catalog\Domain\Product\ProductId;
 use Src\Shared\Application\Bus\CommandHandlerInterface;
+use Src\Shared\Domain\ProductId;
 
 final class CreateProductCommand extends Command
 {
