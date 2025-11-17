@@ -35,11 +35,10 @@ class ReindexProductCommand extends Command
                     'keyword' => ['type' => 'keyword', 'ignore_above' => 256],
                 ],
             ],
-            'manufacturer' => ['type' => 'text'],
+            'manufacturer' => ['type' => 'keyword'],
             'description' => ['type' => 'text'],
             'price' => ['type' => 'integer'],
             'category' => ['type' => 'keyword'],
-            'attributes' => ['type' => 'object'],
             'created_at' => [
                 'type' => 'date',
                 'format' => 'strict_date_time',
@@ -86,11 +85,16 @@ class ReindexProductCommand extends Command
         $products = ProductEloquentModel::all();
 
         foreach ($products as $product) {
-            $mappedAttributes = [];
+            $flatAttributes = [];
 
             foreach ($product->attributes()->get() as $attribute) {
-                /** @var ProductAttributeEloquentModel $attribute */
-                $mappedAttributes[$attribute->categoryAttribute->name] = $attribute->value;
+                $val = $attribute->value;
+                $key = 'attr_' . $attribute->categoryAttribute->name;
+                if (is_numeric($val)) {
+                    $flatAttributes[$key] = (float) $val;
+                } else {
+                    $flatAttributes[$key] = $val;
+                }
             }
 
             /** @var ProductEloquentModel $product */
@@ -102,7 +106,7 @@ class ReindexProductCommand extends Command
                     manufacturer: $product->manufacturer,
                     category: $product->category->name->value,
                     price: $product->price,
-                    attributes: $mappedAttributes,
+                    attributes: $flatAttributes,
                     createdAt: $product->created_at
                 )
             );

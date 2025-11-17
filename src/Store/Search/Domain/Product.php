@@ -27,7 +27,7 @@ readonly class Product
      */
     public function toIndex(): array
     {
-        return [
+        $array = [
             'id' => $this->id->value,
             'name' => $this->name,
             'category' => $this->category,
@@ -37,5 +37,11 @@ readonly class Product
             'manufacturer' => $this->manufacturer,
             'created_at' => $this->createdAt->format(DATE_ATOM),
         ];
+
+        foreach ($this->attributes as $key => $value) {
+            $array[$key] = $value;
+        }
+
+        return $array;
     }
 }

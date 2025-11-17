@@ -23,6 +23,11 @@ enum CategoryAttributeType: string
         return $this === self::INT;
     }
 
+    public function isNumber(): bool
+    {
+        return in_array($this, [self::INT,  self::FLOAT]);
+    }
+
     public function isString(): bool
     {
         return $this === self::STRING;
