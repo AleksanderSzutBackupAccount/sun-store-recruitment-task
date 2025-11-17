@@ -14,7 +14,7 @@ readonly class ProductSearchElasticIndexer implements ProductSearchIndexer
     private const string ELASTIC_PRODUCT_INDEX = 'products';
 
     public function __construct(
-        private  ElasticClient $elasticClient
+        private ElasticClient $elasticClient
     ) {}
 
     public function index(Product $product)
@@ -24,9 +24,9 @@ readonly class ProductSearchElasticIndexer implements ProductSearchIndexer
 
     public function update(Product $product): void
     {
-         $this->elasticClient->update(self::ELASTIC_PRODUCT_INDEX,
+        $this->elasticClient->update(self::ELASTIC_PRODUCT_INDEX,
             $product->id->value,
-        $product->toIndex());
+            $product->toIndex());
     }
 
     public function delete(ProductId $id)

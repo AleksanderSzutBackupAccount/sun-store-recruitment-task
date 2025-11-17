@@ -11,9 +11,7 @@ readonly class IndexProductOnCreated
 {
     public function __construct(
         private ProductSearchIndexer $productSearchIndexer,
-    )
-    {
-    }
+    ) {}
 
     public function handle(ProductCreatedMessage $event): void
     {

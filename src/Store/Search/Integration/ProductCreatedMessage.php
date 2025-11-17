@@ -10,7 +10,5 @@ class ProductCreatedMessage
 {
     public function __construct(
         public Product $entity
-    )
-    {
-    }
+    ) {}
 }

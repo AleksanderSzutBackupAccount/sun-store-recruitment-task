@@ -32,8 +32,9 @@ class CatalogServiceProvider extends BaseContextServiceProvider
     ];
 
     protected array $providers = [
-        EventSearchServiceProvider::class
+        EventSearchServiceProvider::class,
     ];
+
     protected array $useCases = [
         CreateCategory::class => CreateCategoryHandler::class,
         CreateProduct::class => CreateProductHandler::class,

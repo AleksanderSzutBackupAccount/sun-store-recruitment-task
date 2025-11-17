@@ -11,7 +11,6 @@ use Src\Store\Search\Integration\ProductCreatedMessage;
 
 class PublishProductCreatedMessageEvent
 {
-
     public function handle(ProductCreated $event): void
     {
         event(new ProductCreatedMessage($this->map($event->entity)));

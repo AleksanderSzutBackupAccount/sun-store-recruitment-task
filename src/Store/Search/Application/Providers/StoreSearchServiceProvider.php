@@ -24,7 +24,7 @@ class StoreSearchServiceProvider extends BaseContextServiceProvider
     ];
 
     protected array $providers = [
-        EventSearchServiceProvider::class
+        EventSearchServiceProvider::class,
     ];
 
     protected array $useCases = [
