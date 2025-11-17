@@ -7,10 +7,10 @@ namespace Src\Store\Search\Domain;
 final readonly class SearchProductsDto
 {
     public function __construct(
-        public ?string $query = null,
+        public ?string $search = null,
         public ?string $category = null,
-        public ?string $sortBy = 'id',
-        public ?string $sortOrder = 'asc',
+        public string $sortBy = 'created_at',
+        public string $sortOrder = 'asc',
         public ?string $cursor = null,
         public ?float $minPrice = null,
         public ?float $maxPrice = null,

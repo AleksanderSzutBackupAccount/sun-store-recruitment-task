@@ -22,6 +22,10 @@ class ProductEloquentModel extends CastableModel
 
     protected $with = ['category', 'attributes'];
 
+    public $casts = [
+        'created_at' => 'immutable_datetime',
+    ];
+
     protected $fillable = [
         'id', 'category_id', 'name', 'description', 'manufacturer', 'price',
     ];

@@ -18,15 +18,69 @@ class ReindexProductCommand extends Command
 
     public function handle(ProductSearchIndexer $indexer, ElasticClient $elasticClient): void
     {
-        $elasticClient->deleteIndex('products');
+        try {
+
+            $elasticClient->deleteIndex('products');
+
+        } catch (\Throwable $exception) {
+            $this->error($exception->getMessage());
+        }
         $elasticClient->createIndex('products', [
             'id' => ['type' => 'keyword'],
-            'name' => ['type' => 'text'],
+            'name' => [
+                'type' => 'text',
+                'analyzer' => 'autocomplete_analyzer',
+                'search_analyzer' => 'autocomplete_search_analyzer',
+                'fields' => [
+                    'keyword' => ['type' => 'keyword', 'ignore_above' => 256],
+                ],
+            ],
             'manufacturer' => ['type' => 'text'],
             'description' => ['type' => 'text'],
             'price' => ['type' => 'integer'],
             'category' => ['type' => 'keyword'],
             'attributes' => ['type' => 'object'],
+            'created_at' => [
+                'type' => 'date',
+                'format' => 'strict_date_time',
+            ],
+        ], [
+            'analysis' => [
+                'filter' => [
+                    'my_word_delimiter' => [
+                        'type' => 'word_delimiter_graph',
+                        'split_on_case_change' => true,
+                        'generate_word_parts' => true,
+                        'generate_number_parts' => true,
+                        'catenate_all' => true,
+                    ],
+                ],
+                'analyzer' => [
+                    'my_custom_analyzer' => [
+                        'tokenizer' => 'standard',
+                        'filter' => [
+                            'lowercase',
+                            'my_word_delimiter',
+                        ],
+                    ],
+                    'autocomplete_analyzer' => [
+                        'tokenizer' => 'autocomplete_tokenizer',
+                        'filter' => ['lowercase'],
+                    ],
+                    'autocomplete_search_analyzer' => [
+                        'tokenizer' => 'standard',
+                        'filter' => ['lowercase'],
+                    ],
+                ],
+                'tokenizer' => [
+                    'autocomplete_tokenizer' => [
+                        'type' => 'edge_ngram',
+                        'min_gram' => 2,
+                        'max_gram' => 20,
+                        'token_chars' => ['letter', 'digit'],
+                    ],
+                ],
+            ],
         ]);
 
         $products = ProductEloquentModel::all();
@@ -38,16 +92,18 @@ class ReindexProductCommand extends Command
                 /** @var ProductAttributeEloquentModel $attribute */
                 $mappedAttributes[$attribute->categoryAttribute->name] = $attribute->value;
             }
+
             /** @var ProductEloquentModel $product */
             $indexer->index(
                 new Product(
                     id: new ProductId($product->id),
                     name: $product->name,
                     description: $product->description,
-                    manufacture: $product->manufacture,
+                    manufacturer: $product->manufacturer,
                     category: $product->category->name->value,
                     price: $product->price,
-                    attributes: $mappedAttributes
+                    attributes: $mappedAttributes,
+                    createdAt: $product->created_at
                 )
             );
         }

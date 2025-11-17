@@ -23,15 +23,19 @@ class ElasticClient
             ->build();
     }
 
-    public function createIndex(string $indexName, array $properties): void
+    public function createIndex(string $indexName, array $properties, array $settings = []): void
     {
+        $body = [
+            'mappings' => [
+                'properties' => $properties,
+            ],
+        ];
+        if ($settings) {
+            $body['settings'] = $settings;
+        }
         $this->client->indices()->create([
             'index' => $indexName,
-            'body' => [
-                'mappings' => [
-                    'properties' => $properties,
-                ],
-            ],
+            'body' => $body,
         ]);
     }
 

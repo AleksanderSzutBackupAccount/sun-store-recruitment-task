@@ -5,6 +5,17 @@ namespace Src\Store\Search\UI\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Src\Store\Search\Domain\SearchProductsDto;
 
+/**
+ * @property-read string|null $search
+ * @property-read int|null $min_price
+ * @property-read int|null $max_price
+ * @property-read string|null $category
+ * @property-read string|null $sort_by
+ * @property-read string|null $sort_order
+ * @property-read string|null $cursor
+ * @property-read int|null $perPage
+ * @property-read array<string>|null $filters
+ */
 class SearchProductRequest extends FormRequest
 {
     public function authorize(): bool
@@ -12,36 +23,37 @@ class SearchProductRequest extends FormRequest
         return true;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
             'query' => ['nullable', 'string', 'max:255'],
-            'minPrice' => ['nullable', 'numeric', 'min:0'],
-            'maxPrice' => ['nullable', 'numeric', 'min:0'],
+            'min_price' => ['nullable', 'numeric', 'min:0'],
+            'max_price' => ['nullable', 'numeric', 'min:0'],
             'category' => ['nullable', 'string', 'max:100'],
-            'sortField' => ['nullable', 'string', 'in:id,name,price,created_at'],
-            'sortOrder' => ['nullable', 'string', 'in:asc,desc'],
+            'sort_by' => ['nullable', 'string', 'in:id,name.keyword,price,created_at'],
+            'sort_order' => ['nullable', 'string', 'in:asc,desc'],
             'cursor' => ['nullable', 'string'],
-            'perPage' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'attributes' => ['nullable', 'array'],
-            'attributes.*' => ['string', 'max:255'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:200'],
+            'filters' => ['nullable', 'array'],
+            'filters.*' => ['string', 'max:255'],
         ];
     }
 
     public function toDto(): SearchProductsDto
     {
-        $data = $this->validated();
-
         return new SearchProductsDto(
-            query: $data['query'] ?? null,
-            category: $data['category'] ?? null,
-            sortBy: $data['sortField'] ?? 'id',
-            sortOrder: $data['sortOrder'] ?? 'asc',
-            cursor: $data['cursor'] ?? null,
-            minPrice: isset($data['minPrice']) ? (int) $data['minPrice'] : null,
-            maxPrice: isset($data['maxPrice']) ? (int) $data['maxPrice'] : null,
-            filters: $data['attributes'] ?? [],
-            perPage: (int) ($data['perPage'] ?? 15),
+            search: $this->search,
+            category: $this->category,
+            sortBy: $this->sort_by ?? 'created_at',
+            sortOrder: $this->sort_order ?? 'asc',
+            cursor: $this->cursor,
+            minPrice: $this->min_price,
+            maxPrice: $this->max_price,
+            filters: $this->filters ?? [],
+            perPage: $this->perPage ?? 15,
         );
     }
 }
