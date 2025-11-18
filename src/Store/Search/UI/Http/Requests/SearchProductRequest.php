@@ -38,7 +38,8 @@ class SearchProductRequest extends FormRequest
             'cursor' => ['nullable', 'string'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:200'],
             'filters' => ['nullable', 'array'],
-            'filters.*' => ['string', 'max:255'],
+            'filters.*' => ['nullable'],
+            'filters.*.*' => ['nullable'],
         ];
     }
 

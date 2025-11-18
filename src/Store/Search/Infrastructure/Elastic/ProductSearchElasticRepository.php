@@ -46,9 +46,41 @@ class ProductSearchElasticRepository implements ProductSearchRepository
         }
 
         foreach ($dto->filters as $key => $value) {
+            if (is_array($value) && count($value) === 2 && is_numeric($value[0]) && is_numeric($value[1])) {
+                $must[] = [
+                    'range' => [
+                        $key => [
+                            'gte' => $value[0],
+                            'lte' => $value[1],
+                        ],
+                    ],
+                ];
+                continue;
+            }
+
+            if (is_array($value)) {
+                $should = [];
+                foreach ($value as $v) {
+                    $should[] = [
+                        'term' => [
+                            $key => $v,
+                        ],
+                    ];
+                }
+
+                $must[] = [
+                    'bool' => [
+                        'should' => $should,
+                        'minimum_should_match' => 1,
+                    ],
+                ];
+
+                continue;
+            }
+
             $must[] = [
                 'term' => [
-                    "$key.keyword" => $value,
+                    $key => $value,
                 ],
             ];
         }
@@ -61,10 +93,10 @@ class ProductSearchElasticRepository implements ProductSearchRepository
                 ['id' => ['order' => $dto->sortOrder]],
             ],
             'aggs' => [
-                'categories' => [
+                'category' => [
                     'terms' => ['field' => 'category']
                 ],
-                'manufacturers' => [
+                'manufacturer' => [
                     'terms' => ['field' => 'manufacturer']
                 ],
                 'price_stats' => [
@@ -83,10 +115,23 @@ class ProductSearchElasticRepository implements ProductSearchRepository
                 continue;
             }
             $query['aggs'][$field] = [
-                'terms' => ['field' => $field . '.keyword']
+                'terms' => ['field' => $field ]
             ];
         }
+        $response = $this->client->search(self::ELASTIC_PRODUCT_INDEX, $query);
 
+        $filters =  [
+            'category' => [
+                'ui' => 'select', 'values'=>array_map(
+                    fn($bucket) => $bucket['key'],
+                    $response['aggregations']['category']['buckets'] ?? [],
+                )],
+            'price' => [
+                'min' => $response['aggregations']['price_stats']['min'] ?? null,
+                'max' => $response['aggregations']['price_stats']['max'] ?? null,
+                'ui' => 'range'
+            ],
+        ];
         if ($dto->cursor) {
             $query['search_after'] = json_decode(base64_decode($dto->cursor), true);
         }
@@ -111,17 +156,6 @@ class ProductSearchElasticRepository implements ProductSearchRepository
             }
         }
 
-        $filters =  [
-            'categories' => array_map(
-                fn($bucket) => $bucket['key'],
-                $response['aggregations']['categories']['buckets'] ?? []
-            ),
-            'price' => [
-                'min' => $response['aggregations']['price_stats']['min'] ?? null,
-                'max' => $response['aggregations']['price_stats']['max'] ?? null,
-            ],
-        ];
-
         foreach ($attributeModels as $attr) {
             $field = 'attr_' . $attr->name;
             if ($attr->type->isNumber()) {
@@ -132,6 +166,7 @@ class ProductSearchElasticRepository implements ProductSearchRepository
                         'unit' => $attr->unit,
                         'min' => $stats['min'] ?? null,
                         'max' => $stats['max'] ?? null,
+                        'ui' => 'range'
                     ];
                 }
                 continue;
@@ -140,6 +175,7 @@ class ProductSearchElasticRepository implements ProductSearchRepository
             $filters[$field] = [
                 'type' => 'string',
                 'values' => array_map(fn($b) => $b['key'], $terms),
+                'ui' => 'select'
             ];
         }
         return [
@@ -153,5 +189,92 @@ class ProductSearchElasticRepository implements ProductSearchRepository
                 'total' => $response['hits']['total']['value'] ?? null,
             ],
         ];
+    }
+
+
+
+    public function getFilters(): array
+    {
+        $query = [
+            'size' => 0,
+            'aggs' => [
+                'category' => [
+                    'terms' => ['field' => 'category']
+                ],
+                'manufacturer' => [
+                    'terms' => ['field' => 'manufacturer']
+                ],
+                'price_stats' => [
+                    'stats' => ['field' => 'price']
+                ],
+            ],
+        ];
+
+        // Dynamic attributes
+        $attributeModels = CategoryAttributeEloquentModel::all();
+
+        foreach ($attributeModels as $attr) {
+            $field = 'attr_' . $attr->name;
+
+            if ($attr->type->isNumber()) {
+                $query['aggs'][$field] = [
+                    'stats' => ['field' => $field]
+                ];
+            } else {
+                $query['aggs'][$field] = [
+                    'terms' => ['field' => $field ]
+                ];
+            }
+        }
+
+        $response = $this->client->search(self::ELASTIC_PRODUCT_INDEX, $query);
+
+        $filters = [
+            'category' => [
+                'ui' => 'select',
+                'values' => array_map(
+                    fn($b) => $b['key'],
+                    $response['aggregations']['category']['buckets'] ?? []
+                )
+            ],
+            'manufacturer' => [
+                'ui' => 'select_many',
+                'values' => array_map(
+                    fn($b) => $b['key'],
+                    $response['aggregations']['manufacturer']['buckets'] ?? []
+                )
+            ],
+            'price' => [
+                'ui' => 'range',
+                'unit' => 'zł',
+                'min' => $response['aggregations']['price_stats']['min'] ?? null,
+                'max' => $response['aggregations']['price_stats']['max'] ?? null,
+            ],
+        ];
+
+        foreach ($attributeModels as $attr) {
+            $field = 'attr_' . $attr->name;
+
+            if ($attr->type->isNumber()) {
+                $stats = $response['aggregations'][$field] ?? null;
+                $filters[$field] = [
+                    'type' => 'number',
+                    'ui' => 'range',
+                    'unit' => $attr->unit,
+                    'min' => $stats['min'] ?? null,
+                    'max' => $stats['max'] ?? null,
+                ];
+                continue;
+            }
+
+            $terms = $response['aggregations'][$field]['buckets'] ?? [];
+            $filters[$field] = [
+                'type' => 'string',
+                'ui' => 'select_many',
+                'values' => array_map(fn($b) => $b['key'], $terms),
+            ];
+        }
+
+        return $filters;
     }
 }

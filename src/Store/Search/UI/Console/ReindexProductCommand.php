@@ -25,7 +25,26 @@ class ReindexProductCommand extends Command
         } catch (\Throwable $exception) {
             $this->error($exception->getMessage());
         }
-        $elasticClient->createIndex('products', [
+
+        $attributeMappings = [];
+        $attributes = ProductAttributeEloquentModel::with('categoryAttribute')->get();
+
+        foreach ($attributes as $attribute) {
+            $key = 'attr_' . $attribute->categoryAttribute->name;
+
+            if ($attribute->categoryAttribute->type->isNumber()) {
+                $attributeMappings[$key] = ['type' => 'float'];
+            } else {
+                $attributeMappings[$key] = [
+                    'type' => 'keyword',
+                    'fields' => [
+                        'text' => ['type' => 'text']
+                    ]
+                ];
+            }
+        }
+
+        $elasticClient->createIndex('products', array_merge([
             'id' => ['type' => 'keyword'],
             'name' => [
                 'type' => 'text',
@@ -43,7 +62,7 @@ class ReindexProductCommand extends Command
                 'type' => 'date',
                 'format' => 'strict_date_time',
             ],
-        ], [
+        ], $attributeMappings), [
             'analysis' => [
                 'filter' => [
                     'my_word_delimiter' => [
