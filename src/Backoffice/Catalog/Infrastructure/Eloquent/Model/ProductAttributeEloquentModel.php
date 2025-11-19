@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Factories\ProductAttributeEloquentFactory;
 use Src\Shared\Infrastructure\Models\CastableModel;
 
+/**
+ * @property CategoryAttributeEloquentModel $categoryAttribute
+ */
 class ProductAttributeEloquentModel extends CastableModel
 {
     /**

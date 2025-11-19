@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace Src\Backoffice\Catalog\Infrastructure\Eloquent\Model;
 
+use DateTimeImmutable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Factories\ProductEloquentFactory;
+use Src\Shared\Domain\ProductId;
 use Src\Shared\Infrastructure\Models\CastableModel;
 
+/**
+ * @property ProductId $id
+ * @property string $name
+ * @property string $description
+ * @property string $manufacturer
+ * @property CategoryEloquentModel $category
+ * @property int $price
+ * @property DateTimeImmutable $created_at
+ */
 class ProductEloquentModel extends CastableModel
 {
     /**
@@ -24,6 +35,7 @@ class ProductEloquentModel extends CastableModel
 
     public $casts = [
         'created_at' => 'immutable_datetime',
+        'id' => ProductId::class,
     ];
 
     protected $fillable = [

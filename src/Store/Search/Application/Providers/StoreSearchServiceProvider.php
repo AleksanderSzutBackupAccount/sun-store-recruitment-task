@@ -35,9 +35,12 @@ class StoreSearchServiceProvider extends BaseContextServiceProvider
         parent::register();
 
         $this->app->singleton(ElasticConfig::class, function ($app) {
+            /** @var string[] $hosts */
             $hosts = config('database.elastic.hosts');
+            /** @var ?string $apiKey */
+            $apiKey = config('database.elastic.api_key');
 
-            return new ElasticConfig($hosts);
+            return new ElasticConfig($hosts, $apiKey);
         });
     }
 }

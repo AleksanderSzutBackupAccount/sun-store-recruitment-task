@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Src\Store\Search\Domain;
 
+use Src\Store\Search\Domain\Filters\Filters;
+
 final readonly class SearchProductsDto
 {
     public function __construct(
-        public ?string $search = null,
-        public ?string $category = null,
-        public string $sortBy = 'created_at',
-        public string $sortOrder = 'asc',
-        public ?string $cursor = null,
-        public ?float $minPrice = null,
-        public ?float $maxPrice = null,
-        public array $filters = [],
+        public ?string $search,
+        public ?string $category,
+        public string $sortBy,
+        public string $sortOrder,
+        public ?string $cursor,
+        public Filters $filters,
         public int $perPage = 15
     ) {}
 }

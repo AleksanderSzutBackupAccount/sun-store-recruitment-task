@@ -7,6 +7,7 @@ use Elastic\Elasticsearch\ClientBuilder;
 use Elastic\Elasticsearch\Exception\AuthenticationException;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Elasticsearch\Response\Elasticsearch;
 use Src\Shared\Infrastructure\Config\ElasticConfig;
 
 class ElasticClient
@@ -18,11 +19,20 @@ class ElasticClient
      */
     public function __construct(ElasticConfig $config)
     {
-        $this->client = ClientBuilder::create()
-            ->setHosts($config->hosts)
-            ->build();
+        $builder = ClientBuilder::create()
+            ->setHosts($config->hosts);
+
+        if ($config->apiKey) {
+            $builder->setApiKey($config->apiKey);
+        }
+
+        $this->client = $builder->build();
     }
 
+    /**
+     * @param  array<string, mixed>  $properties
+     * @param  array<string, mixed>  $settings
+     */
     public function createIndex(string $indexName, array $properties, array $settings = []): void
     {
         $body = [
@@ -46,19 +56,30 @@ class ElasticClient
         ]);
     }
 
-    public function search(string $index, array $query)
+    /**
+     * @param  array<string, mixed>  $query
+     * @return mixed[]
+     */
+    public function search(string $index, array $query): array
     {
-        return $this->client->search([
+        /** @var Elasticsearch $response */
+        $response = $this->client->search([
             'index' => $index,
             'body' => $query,
-        ])->asArray();
+        ]);
+
+        return $response->asArray();
     }
 
     /**
      * Update a document by ID.
+     *
+     * @param  array<string, mixed>  $body
+     * @return mixed[]
      */
     public function update(string $index, string $id, array $body): array
     {
+        /** @var Elasticsearch $response */
         $response = $this->client->update([
             'index' => $index,
             'id' => $id,
@@ -90,9 +111,12 @@ class ElasticClient
 
     /**
      * Reindex from one index to another (useful for schema changes).
+     *
+     * @return mixed[]
      */
     public function reindex(string $sourceIndex, string $destinationIndex): array
     {
+        /** @var Elasticsearch $response */
         $response = $this->client->reindex([
             'body' => [
                 'source' => ['index' => $sourceIndex],
@@ -104,12 +128,19 @@ class ElasticClient
         return $response->asArray();
     }
 
-    public function index(string $index, string $id, array $body)
+    /**
+     * @param  array<string, mixed>  $body
+     * @return mixed[]
+     */
+    public function index(string $index, string $id, array $body): array
     {
-        return $this->client->index([
+        /** @var Elasticsearch $response */
+        $response = $this->client->index([
             'index' => $index,
             'id' => $id,
             'body' => $body,
         ]);
+
+        return $response->asArray();
     }
 }

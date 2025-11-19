@@ -3,6 +3,7 @@
 namespace Src\Store\Search\UI\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Src\Store\Search\Domain\Filters\Filters;
 use Src\Store\Search\Domain\SearchProductsDto;
 
 /**
@@ -14,7 +15,7 @@ use Src\Store\Search\Domain\SearchProductsDto;
  * @property-read string|null $sort_order
  * @property-read string|null $cursor
  * @property-read int|null $per_page
- * @property-read array<string>|null $filters
+ * @property-read null|array<string, string|mixed[]> $filters
  */
 class SearchProductRequest extends FormRequest
 {
@@ -51,9 +52,7 @@ class SearchProductRequest extends FormRequest
             sortBy: $this->sort_by ?? 'created_at',
             sortOrder: $this->sort_order ?? 'asc',
             cursor: $this->cursor,
-            minPrice: $this->min_price,
-            maxPrice: $this->max_price,
-            filters: $this->filters ?? [],
+            filters: Filters::fromArray($this->filters ?? []),
             perPage: $this->per_page ?? 15,
         );
     }

@@ -17,7 +17,10 @@ readonly class ProductSearchElasticIndexer implements ProductSearchIndexer
         private ElasticClient $elasticClient
     ) {}
 
-    public function index(Product $product)
+    /**
+     * @return mixed[]
+     */
+    public function index(Product $product): array
     {
         return $this->elasticClient->index(self::ELASTIC_PRODUCT_INDEX, $product->id->value, $product->toIndex());
     }
@@ -29,7 +32,7 @@ readonly class ProductSearchElasticIndexer implements ProductSearchIndexer
             $product->toIndex());
     }
 
-    public function delete(ProductId $id)
+    public function delete(ProductId $id): void
     {
         $this->elasticClient->delete(self::ELASTIC_PRODUCT_INDEX, $id->value);
     }

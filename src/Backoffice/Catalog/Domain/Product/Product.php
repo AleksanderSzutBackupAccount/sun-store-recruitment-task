@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Backoffice\Catalog\Domain\Product;
 
+use Carbon\CarbonImmutable;
 use Src\Backoffice\Catalog\Domain\Category\Category;
 use Src\Shared\Domain\Aggregate\AggregateRoot;
 use Src\Shared\Domain\ProductId;
@@ -16,7 +17,8 @@ class Product extends AggregateRoot
         public ProductBaseInfo $information,
         public Category $category,
         public Money $price,
-        public ProductAttributeCollection $attributes
+        public ProductAttributeCollection $attributes,
+        public \DateTimeImmutable $createdAt,
     ) {}
 
     public static function create(
@@ -31,7 +33,8 @@ class Product extends AggregateRoot
             $information,
             $category,
             $price,
-            $attributes
+            $attributes,
+            CarbonImmutable::now()
         );
 
         $entity->record(new ProductCreated($entity));

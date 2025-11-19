@@ -144,6 +144,7 @@ return [
 
     'elastic' => [
         'hosts' => explode(',', env('ELASTIC_HOSTS', 'localhost:9200')),
+        'api_key' => env('ELASTIC_API_KEY', null),
     ],
     'redis' => [
 

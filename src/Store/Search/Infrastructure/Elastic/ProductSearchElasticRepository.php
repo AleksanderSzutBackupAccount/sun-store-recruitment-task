@@ -4,23 +4,144 @@ namespace Src\Store\Search\Infrastructure\Elastic;
 
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryAttributeEloquentModel;
 use Src\Shared\Infrastructure\Elastic\ElasticClient;
+use Src\Store\Search\Domain\Filters\Filter;
+use Src\Store\Search\Domain\Filters\RangeFilter;
+use Src\Store\Search\Domain\Filters\SelectFilter;
+use Src\Store\Search\Domain\Filters\SelectManyFilter;
 use Src\Store\Search\Domain\ProductSearchRepository;
 use Src\Store\Search\Domain\SearchProductsDto;
 
+/**
+ * @phpstan-type ElasticsearchResponse array{
+ *       took: int,
+ *       timed_out: bool,
+ *       _shards: array{
+ *           total: int,
+ *           successful: int,
+ *           skipped: int,
+ *           failed: int
+ *       },
+ *       hits: array{
+ *           total: array{
+ *               value: int,
+ *               relation: string
+ *           },
+ *           max_score: float|null,
+ *           hits: list<array{
+ *               _index: string,
+ *               _id: string,
+ *               _score: float|null,
+ *               _source: array{
+ *                   id: string,
+ *                   name: string,
+ *                   category: string,
+ *                   price: int|float,
+ *                   description: string,
+ *                   attributes: array<string, string|int|float>,
+ *                   manufacturer: string,
+ *                   created_at: string,
+ *                   attr_connector_type?: string,
+ *                   attr_capacity?: int|float,
+ *                   attr_power_output?: int|float
+ *               },
+ *               sort?: list<int|string>
+ *           }>
+ *       },
+ *       aggregations?: array<string, mixed>
+ *   }
+ * @phpstan-type ElasticsearchAggs array{
+ *     category?: array{
+ *         buckets: list<array{
+ *             key: string,
+ *             doc_count: int
+ *         }>
+ *     },
+ *     manufacturer?: array{
+ *         buckets: list<array{
+ *             key: string,
+ *             doc_count: int
+ *         }>
+ *     },
+ *     price_stats?: array{
+ *         count: int,
+ *         min: float|null,
+ *         max: float|null,
+ *         avg: float|null,
+ *         sum: float|null
+ *     },
+ *     attr_connector_type?: array{
+ *         buckets: list<array{
+ *             key: string,
+ *             doc_count: int
+ *         }>
+ *     },
+ *     attr_capacity?: array{
+ *         count: int,
+ *         min: float|null,
+ *         max: float|null,
+ *         avg: float|null,
+ *         sum: float|null
+ *     },
+ *     attr_power_output?: array{
+ *         count: int,
+ *         min: float|null,
+ *         max: float|null,
+ *         avg: float|null,
+ *         sum: float|null
+ *     }
+ * }
+ * @phpstan-type Product array{
+ *     id: string,
+ *     name: string,
+ *     category: string,
+ *     price: int|float,
+ *     description: string,
+ *     attributes: array<string, string|int|float>,
+ *     manufacturer: string,
+ *     created_at: string
+ * }
+ * @phpstan-type UISelectFilter array{
+ *     ui: 'select'|'select_many',
+ *     values: list<string>
+ * }
+ * @phpstan-type UIRangeFilter array{
+ *     ui: 'range',
+ *     unit?: string,
+ *     min: float|int|null,
+ *     max: float|int|null
+ * }
+ * @phpstan-type Filters array<string, UISelectFilter|UIRangeFilter>
+ * @phpstan-type SearchResponse array{
+ *     data: list<Product>,
+ *     filters: Filters,
+ *     meta: array{
+ *         next_cursor: string|null,
+ *         previous_cursor: string|null,
+ *         per_page: int,
+ *         count: int,
+ *         total: int|null
+ *     }
+ * }
+ */
 final class ProductSearchElasticRepository implements ProductSearchRepository
 {
     private const INDEX = 'products';
 
     public function __construct(private ElasticClient $client) {}
 
+    /**
+     * @phpstan-return SearchResponse
+     */
     public function search(SearchProductsDto $dto): array
     {
-        $query = $this->buildQuery($dto);
-        $response = $this->client->search(self::INDEX, $query);
+        $response = $this->callElastic($this->buildQuery($dto));
 
         return $this->formatResponse($response, $dto);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function buildQuery(SearchProductsDto $dto): array
     {
         $must = [];
@@ -39,19 +160,8 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
             $must[] = ['term' => ['category' => $dto->category]];
         }
 
-        if ($dto->minPrice || $dto->maxPrice) {
-            $must[] = [
-                'range' => [
-                    'price' => array_filter([
-                        'gte' => $dto->minPrice,
-                        'lte' => $dto->maxPrice,
-                    ]),
-                ],
-            ];
-        }
-
-        foreach ($dto->filters as $key => $value) {
-            $must[] = $this->buildFilterClause($key, $value);
+        foreach ($dto->filters as $filter) {
+            $must[] = $this->buildFilterClause($filter);
         }
 
         $aggs = $this->buildAggregations();
@@ -73,26 +183,36 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
         return $query;
     }
 
-    private function buildFilterClause(string $key, mixed $value): array
+    /**
+     * @return array<string, mixed[]>
+     */
+    private function buildFilterClause(Filter $filter): array
     {
-        if (is_array($value) && count($value) === 2 && is_numeric($value[0]) && is_numeric($value[1])) {
+        if ($filter instanceof RangeFilter) {
             return [
                 'range' => [
-                    $key => [
-                        'gte' => $value[0],
-                        'lte' => $value[1],
+                    $filter->field => [
+                        'gte' => $filter->min,
+                        'lte' => $filter->max,
                     ],
                 ],
             ];
         }
 
-        if (is_array($value)) {
-            return ['terms' => [$key => $value]];
+        if ($filter instanceof SelectManyFilter) {
+            return ['terms' => [$filter->field => $filter->values]];
         }
 
-        return ['term' => [$key => $value]];
+        if ($filter instanceof SelectFilter) {
+            return ['term' => [$filter->field => $filter->value]];
+        }
+
+        throw new \DomainException('Not implemented');
     }
 
+    /**
+     * @return array<mixed>[]
+     */
     private function buildAggregations(): array
     {
         $aggs = [
@@ -112,9 +232,16 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
         return $aggs;
     }
 
+    /**
+     * @param  ElasticsearchResponse  $response
+     *
+     * @phpstan-return SearchResponse
+     */
     private function formatResponse(array $response, SearchProductsDto $dto): array
     {
-        $hits = $response['hits']['hits'] ?? [];
+        $hits = $response['hits']['hits'];
+
+        /** @var ElasticsearchAggs $aggs */
         $aggs = $response['aggregations'] ?? [];
 
         $next = null;
@@ -124,8 +251,8 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
             $last = $hits[array_key_last($hits)]['sort'] ?? null;
             $first = $hits[array_key_first($hits)]['sort'] ?? null;
 
-            $next = $last ? base64_encode(json_encode($last)) : null;
-            $prev = $first ? base64_encode(json_encode($first)) : null;
+            $next = $this->generateCursor($last);
+            $prev = $this->generateCursor($first);
         }
 
         return [
@@ -136,11 +263,16 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
                 'previous_cursor' => $prev,
                 'per_page' => $dto->perPage,
                 'count' => count($hits),
-                'total' => $response['hits']['total']['value'] ?? null,
+                'total' => $response['hits']['total']['value'],
             ],
         ];
     }
 
+    /**
+     * @param  ElasticsearchAggs  $aggs
+     *
+     * @phpstan-return Filters
+     */
     private function formatFilters(array $aggs): array
     {
         $filters = [
@@ -186,13 +318,36 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
         return $filters;
     }
 
+    /**
+     * @phpstan-return Filters
+     */
     public function getFilters(): array
     {
+        /** @var ElasticsearchAggs $aggrs */
+        $aggrs = $this->callElastic([
+            'size' => 0,
+            'aggs' => $this->buildAggregations(),
+        ])['aggregations'] ?? [];
+
         return $this->formatFilters(
-            $this->client->search(self::INDEX, [
-                'size' => 0,
-                'aggs' => $this->buildAggregations(),
-            ])['aggregations'] ?? []
+            $aggrs
         );
+    }
+
+    public function generateCursor(mixed $first): ?string
+    {
+        return $first ? base64_encode(json_encode($first, JSON_THROW_ON_ERROR)) : null;
+    }
+
+    /**
+     * @param  array<string, mixed>  $query
+     * @return ElasticsearchResponse
+     */
+    private function callElastic(array $query): array
+    {
+        /** @var ElasticsearchResponse $response */
+        $response = $this->client->search(self::INDEX, $query);
+
+        return $response;
     }
 }

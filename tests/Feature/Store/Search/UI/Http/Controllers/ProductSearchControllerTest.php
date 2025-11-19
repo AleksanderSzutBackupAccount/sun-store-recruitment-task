@@ -194,4 +194,132 @@ class ProductSearchControllerTest extends TestCase
             'next_cursor is not valid base64!'
         );
     }
+
+    public function test_product_search_filters_by_dynamic_attributes(): void
+    {
+        $mockElastic = Mockery::mock(ElasticClient::class);
+
+        // --- MOCK RESPONSE Z ELASTICA ---
+        $mockResponse = [
+            'hits' => [
+                'total' => ['value' => 2],
+                'hits' => [
+                    [
+                        '_source' => [
+                            'id' => '10',
+                            'name' => 'Solar Panel X',
+                            'price' => 1200,
+                            'manufacturer' => 'EcoCharge',
+                            'category' => 'solar_panels',
+                            'attributes' => [
+                                'color' => 'red',
+                                'capacity' => 4,
+                            ],
+                        ],
+                        'sort' => [1200, '10'],
+                    ],
+                    [
+                        '_source' => [
+                            'id' => '11',
+                            'name' => 'Solar Panel Y',
+                            'price' => 1500,
+                            'manufacturer' => 'EcoCharge',
+                            'category' => 'solar_panels',
+                            'attributes' => [
+                                'color' => 'red',
+                                'capacity' => 4,
+                            ],
+                        ],
+                        'sort' => [1500, '11'],
+                    ],
+                ],
+            ],
+            'aggregations' => [
+                'manufacturer' => [
+                    'buckets' => [
+                        ['key' => 'EcoCharge'],
+                    ],
+                ],
+                'category' => [
+                    'buckets' => [
+                        ['key' => 'solar_panels'],
+                    ],
+                ],
+                'price_stats' => [
+                    'min' => 1200,
+                    'max' => 1500,
+                ],
+                'attr_color' => [
+                    'buckets' => [
+                        ['key' => 'red'],
+                        ['key' => 'black'],
+                    ],
+                ],
+                'attr_capacity' => [
+                    'buckets' => [
+                        ['key' => 4],
+                        ['key' => 8],
+                    ],
+                ],
+            ],
+        ];
+
+        $mockElastic->shouldReceive('search')
+            ->once()
+            ->andReturn($mockResponse);
+
+        $this->app->instance(ElasticClient::class, $mockElastic);
+
+        $response = $this->get(
+            'api/search/products?'.http_build_query([
+                'query' => 'solar',
+                'category' => 'solar_panels',
+                'sort_by' => 'price',
+                'sort_order' => 'asc',
+                'per_page' => 10,
+                'filters' => [
+                    'color' => ['red'],
+                    'capacity' => [4],
+                ],
+            ])
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJsonStructure([
+            'data' => [
+                [
+                    'id',
+                    'name',
+                    'price',
+                    'manufacturer',
+                    'category',
+                ],
+            ],
+            'filters' => [
+                'category',
+                'manufacturer',
+                'price',
+            ],
+            'meta' => [
+                'next_cursor',
+                'previous_cursor',
+                'per_page',
+                'count',
+                'total',
+            ],
+        ]);
+
+        $this->assertEquals('Solar Panel X', $response->json('data.0.name'));
+        $this->assertEquals('red', $response->json('data.0.attributes.color'));
+
+        // --- PRICE STATS ---
+        $this->assertEquals(1200, $response->json('filters.price.min'));
+        $this->assertEquals(1500, $response->json('filters.price.max'));
+
+        // --- META ---
+        $this->assertEquals(10, $response->json('meta.per_page'));
+        $this->assertEquals(2, $response->json('meta.count'));
+        $this->assertEquals(2, $response->json('meta.total'));
+    }
 }

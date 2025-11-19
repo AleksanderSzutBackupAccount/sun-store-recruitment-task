@@ -8,7 +8,10 @@ use Src\Shared\Domain\ProductId;
 
 interface ProductSearchIndexer
 {
-    public function index(Product $product);
+    /**
+     * @return mixed[]
+     */
+    public function index(Product $product): array;
 
-    public function delete(ProductId $id);
+    public function delete(ProductId $id): void;
 }

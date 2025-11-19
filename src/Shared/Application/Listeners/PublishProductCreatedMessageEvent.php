@@ -31,7 +31,8 @@ class PublishProductCreatedMessageEvent
             $product->information->manufacturer,
             $product->category->name->value,
             $product->price->amount,
-            $attributes
+            $attributes,
+            $product->createdAt
         );
     }
 }

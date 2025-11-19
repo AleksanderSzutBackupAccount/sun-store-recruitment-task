@@ -3,9 +3,9 @@
 namespace Src\Store\Search\UI\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\ProductAttributeEloquentModel;
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\ProductEloquentModel;
-use Src\Shared\Domain\ProductId;
 use Src\Shared\Infrastructure\Elastic\ElasticClient;
 use Src\Store\Search\Domain\Product;
 use Src\Store\Search\Domain\ProductSearchIndexer;
@@ -27,6 +27,8 @@ class ReindexProductCommand extends Command
         }
 
         $attributeMappings = [];
+
+        /** @var Collection<string, ProductAttributeEloquentModel> $attributes */
         $attributes = ProductAttributeEloquentModel::with('categoryAttribute')->get();
 
         foreach ($attributes as $attribute) {
@@ -119,7 +121,7 @@ class ReindexProductCommand extends Command
             /** @var ProductEloquentModel $product */
             $indexer->index(
                 new Product(
-                    id: new ProductId($product->id),
+                    id: $product->id,
                     name: $product->name,
                     description: $product->description,
                     manufacturer: $product->manufacturer,
