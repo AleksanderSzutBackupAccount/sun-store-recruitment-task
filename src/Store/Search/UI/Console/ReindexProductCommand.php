@@ -30,7 +30,7 @@ class ReindexProductCommand extends Command
         $attributes = ProductAttributeEloquentModel::with('categoryAttribute')->get();
 
         foreach ($attributes as $attribute) {
-            $key = 'attr_' . $attribute->categoryAttribute->name;
+            $key = 'attr_'.$attribute->categoryAttribute->name;
 
             if ($attribute->categoryAttribute->type->isNumber()) {
                 $attributeMappings[$key] = ['type' => 'float'];
@@ -38,8 +38,8 @@ class ReindexProductCommand extends Command
                 $attributeMappings[$key] = [
                     'type' => 'keyword',
                     'fields' => [
-                        'text' => ['type' => 'text']
-                    ]
+                        'text' => ['type' => 'text'],
+                    ],
                 ];
             }
         }
@@ -108,7 +108,7 @@ class ReindexProductCommand extends Command
 
             foreach ($product->attributes()->get() as $attribute) {
                 $val = $attribute->value;
-                $key = 'attr_' . $attribute->categoryAttribute->name;
+                $key = 'attr_'.$attribute->categoryAttribute->name;
                 if (is_numeric($val)) {
                     $flatAttributes[$key] = (float) $val;
                 } else {

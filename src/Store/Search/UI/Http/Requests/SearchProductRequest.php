@@ -13,7 +13,7 @@ use Src\Store\Search\Domain\SearchProductsDto;
  * @property-read string|null $sort_by
  * @property-read string|null $sort_order
  * @property-read string|null $cursor
- * @property-read int|null $perPage
+ * @property-read int|null $per_page
  * @property-read array<string>|null $filters
  */
 class SearchProductRequest extends FormRequest
@@ -54,7 +54,7 @@ class SearchProductRequest extends FormRequest
             minPrice: $this->min_price,
             maxPrice: $this->max_price,
             filters: $this->filters ?? [],
-            perPage: $this->perPage ?? 15,
+            perPage: $this->per_page ?? 15,
         );
     }
 }

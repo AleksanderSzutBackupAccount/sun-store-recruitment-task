@@ -51,7 +51,7 @@ class ElasticClient
         return $this->client->search([
             'index' => $index,
             'body' => $query,
-        ]);
+        ])->asArray();
     }
 
     /**
