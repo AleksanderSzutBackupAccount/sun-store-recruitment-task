@@ -28,6 +28,8 @@ class ProductSearchControllerTest extends TestCase
                             'price' => 999,
                             'manufacturer' => 'EcoCharge',
                             'category' => 'batteries',
+                            'description' => 'desc',
+                            'created_at' => '2024-01-01',
                         ],
                         'sort' => [999, '123'],
                     ],
@@ -102,6 +104,8 @@ class ProductSearchControllerTest extends TestCase
                             'price' => 500,
                             'manufacturer' => 'EcoCharge',
                             'category' => 'batteries',
+                            'description' => 'desc',
+                            'created_at' => '2024-01-01',
                         ],
                         'sort' => [500, '1'],
                     ],
@@ -112,6 +116,8 @@ class ProductSearchControllerTest extends TestCase
                             'price' => 1500,
                             'manufacturer' => 'SafeLock',
                             'category' => 'batteries',
+                            'description' => 'desc',
+                            'created_at' => '2024-01-01',
                         ],
                         'sort' => [1500, '2'],
                     ],
@@ -198,8 +204,6 @@ class ProductSearchControllerTest extends TestCase
     public function test_product_search_filters_by_dynamic_attributes(): void
     {
         $mockElastic = Mockery::mock(ElasticClient::class);
-
-        // --- MOCK RESPONSE Z ELASTICA ---
         $mockResponse = [
             'hits' => [
                 'total' => ['value' => 2],
@@ -209,12 +213,12 @@ class ProductSearchControllerTest extends TestCase
                             'id' => '10',
                             'name' => 'Solar Panel X',
                             'price' => 1200,
+                            'description' => 'The HomeVault 10 is a 10kWh LiFePO4 battery designed for whole-home backup.',
                             'manufacturer' => 'EcoCharge',
                             'category' => 'solar_panels',
-                            'attributes' => [
-                                'color' => 'red',
-                                'capacity' => 4,
-                            ],
+                            'created_at' => '2024-01-01',
+                            'attr_color' => 'red',
+                            'attr_capacity' => 4,
                         ],
                         'sort' => [1200, '10'],
                     ],
@@ -224,11 +228,11 @@ class ProductSearchControllerTest extends TestCase
                             'name' => 'Solar Panel Y',
                             'price' => 1500,
                             'manufacturer' => 'EcoCharge',
+                            'description' => 'The HomeVault 10 is a 10kWh LiFePO4 battery designed for whole-home backup. It features an advanced Battery Management System (BMS) for optimal safety and a 6,000 cycle life.',
                             'category' => 'solar_panels',
-                            'attributes' => [
-                                'color' => 'red',
-                                'capacity' => 4,
-                            ],
+                            'created_at' => '2024-01-01',
+                            'attr_color' => 'red',
+                            'attr_capacity' => 4,
                         ],
                         'sort' => [1500, '11'],
                     ],
@@ -311,7 +315,7 @@ class ProductSearchControllerTest extends TestCase
         ]);
 
         $this->assertEquals('Solar Panel X', $response->json('data.0.name'));
-        $this->assertEquals('red', $response->json('data.0.attributes.color'));
+        $this->assertEquals('red', $response->json('data.0.attr_color'));
 
         // --- PRICE STATS ---
         $this->assertEquals(1200, $response->json('filters.price.min'));

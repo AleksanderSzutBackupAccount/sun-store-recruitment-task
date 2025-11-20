@@ -3,12 +3,19 @@
 namespace Src\Store\Search\Infrastructure\Elastic;
 
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryAttributeEloquentModel;
+use Src\Shared\Domain\Response\Filters\FilterDefinitionList;
+use Src\Shared\Domain\Response\Filters\RangeFilterDefinition;
+use Src\Shared\Domain\Response\Filters\SelectFilterDefinition;
+use Src\Shared\Domain\Response\Filters\SelectManyFilterDefinition;
+use Src\Shared\Domain\Response\MetaResponse;
 use Src\Shared\Infrastructure\Elastic\ElasticClient;
 use Src\Store\Search\Domain\Filters\Filter;
 use Src\Store\Search\Domain\Filters\RangeFilter;
 use Src\Store\Search\Domain\Filters\SelectFilter;
 use Src\Store\Search\Domain\Filters\SelectManyFilter;
 use Src\Store\Search\Domain\ProductSearchRepository;
+use Src\Store\Search\Domain\Response\ProductResponse;
+use Src\Store\Search\Domain\Response\ProductSearchPaginatedResponse;
 use Src\Store\Search\Domain\SearchProductsDto;
 
 /**
@@ -129,10 +136,7 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
 
     public function __construct(private ElasticClient $client) {}
 
-    /**
-     * @phpstan-return SearchResponse
-     */
-    public function search(SearchProductsDto $dto): array
+    public function search(SearchProductsDto $dto): ProductSearchPaginatedResponse
     {
         $response = $this->callElastic($this->buildQuery($dto));
 
@@ -234,10 +238,8 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
 
     /**
      * @param  ElasticsearchResponse  $response
-     *
-     * @phpstan-return SearchResponse
      */
-    private function formatResponse(array $response, SearchProductsDto $dto): array
+    private function formatResponse(array $response, SearchProductsDto $dto): ProductSearchPaginatedResponse
     {
         $hits = $response['hits']['hits'];
 
@@ -255,41 +257,37 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
             $prev = $this->generateCursor($first);
         }
 
-        return [
-            'data' => array_map(fn ($h) => $h['_source'], $hits),
-            'filters' => $this->formatFilters($aggs),
-            'meta' => [
-                'next_cursor' => $next,
-                'previous_cursor' => $prev,
-                'per_page' => $dto->perPage,
-                'count' => count($hits),
-                'total' => $response['hits']['total']['value'],
-            ],
-        ];
+        /** @var ProductResponse[] $items */
+        $items = array_map(static fn ($h) => ProductResponse::fromArray($h['_source']), $hits);
+        $meta = new MetaResponse(
+            nextCursor: $next,
+            previousCursor: $prev,
+            perPage: $dto->perPage,
+            count: count($hits),
+            total: $response['hits']['total']['value'],
+        );
+
+        return new ProductSearchPaginatedResponse(
+            meta: $meta,
+            data: $items,
+            filters: $this->formatFilters($aggs)
+        );
     }
 
     /**
      * @param  ElasticsearchAggs  $aggs
-     *
-     * @phpstan-return Filters
      */
-    private function formatFilters(array $aggs): array
+    private function formatFilters(array $aggs): FilterDefinitionList
     {
+
         $filters = [
-            'category' => [
-                'ui' => 'select',
-                'values' => array_column($aggs['category']['buckets'] ?? [], 'key'),
-            ],
-            'manufacturer' => [
-                'ui' => 'select_many',
-                'values' => array_column($aggs['manufacturer']['buckets'] ?? [], 'key'),
-            ],
-            'price' => [
-                'ui' => 'range',
-                'unit' => 'zł',
-                'min' => $aggs['price_stats']['min'] ?? null,
-                'max' => $aggs['price_stats']['max'] ?? null,
-            ],
+            'category' => new SelectFilterDefinition(array_column($aggs['category']['buckets'] ?? [], 'key')),
+            'manufacturer' => new SelectManyFilterDefinition(array_column($aggs['manufacturer']['buckets'] ?? [], 'key')),
+            'price' => new RangeFilterDefinition(
+                'zł',
+                $aggs['price_stats']['min'] ?? null,
+                $aggs['price_stats']['max'] ?? null
+            ),
         ];
 
         foreach (CategoryAttributeEloquentModel::all() as $attr) {
@@ -301,27 +299,18 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
             }
 
             $filters[$field] = $attr->type->isNumber()
-                ? [
-                    'type' => 'number',
-                    'ui' => 'range',
-                    'unit' => $attr->unit,
-                    'min' => $agg['min'] ?? null,
-                    'max' => $agg['max'] ?? null,
-                ]
-                : [
-                    'type' => 'string',
-                    'ui' => 'select_many',
-                    'values' => array_column($agg['buckets'] ?? [], 'key'),
-                ];
+                ? new RangeFilterDefinition(
+                    $attr->unit,
+                    $agg['min'] ?? null,
+                    $agg['max'] ?? null
+                )
+                : new SelectManyFilterDefinition(array_column($agg['buckets'] ?? [], 'key'));
         }
 
-        return $filters;
+        return new FilterDefinitionList($filters);
     }
 
-    /**
-     * @phpstan-return Filters
-     */
-    public function getFilters(): array
+    public function getFilters(): FilterDefinitionList
     {
         /** @var ElasticsearchAggs $aggrs */
         $aggrs = $this->callElastic([

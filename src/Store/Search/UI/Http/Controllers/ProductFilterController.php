@@ -17,6 +17,6 @@ class ProductFilterController extends Controller
     {
         $result = $this->repository->getFilters();
 
-        return response()->json($result);
+        return response()->json($result->toResponse());
     }
 }

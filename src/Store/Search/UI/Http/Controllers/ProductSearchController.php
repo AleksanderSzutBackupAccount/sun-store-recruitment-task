@@ -17,6 +17,6 @@ class ProductSearchController extends Controller
     {
         $result = $this->searchQuery->handle($request->toDto());
 
-        return response()->json($result);
+        return response()->json($result->toResponse());
     }
 }
