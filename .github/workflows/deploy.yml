@@ -43,3 +43,11 @@ jobs:
           region: ${{ secrets.GCP_REGION }}
           allow-unauthenticated: true
           env_vars_file: .env
+
+      - name: Deploy Cloud Run Job
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          job: backend-job
+          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/backend/backend
+          region: ${{ secrets.GCP_REGION }}
+          env_vars_file: .env
