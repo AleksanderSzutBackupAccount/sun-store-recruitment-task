@@ -16,6 +16,12 @@ COPY ./deployment/nginx.conf /etc/nginx/nginx.conf
 COPY ./deployment/supervisord.conf /etc/supervisord.conf
 COPY ./deployment/entrypoint.sh /etc/entrypoint.sh
 
+RUN chmod -R 777 storage bootstrap/cache \
+ && php artisan config:cache \
+ && php artisan route:cache \
+ && php artisan event:cache \
+ && composer dump-autoload -o
+
 EXPOSE 8080
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
