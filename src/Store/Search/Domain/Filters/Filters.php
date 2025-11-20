@@ -30,8 +30,7 @@ class Filters extends Collection
                 continue;
             }
             if (isset($value[0], $value[1]) && is_numeric($value[0]) && is_numeric($value[1])) {
-                /** @var array{0:int|float,1:int|float} $value */
-                $filter->push(new RangeFilter($field, $value[0], $value[1]));
+                $filter->push(new RangeFilter($field, +$value[0], +$value[1]));
 
                 continue;
             }
