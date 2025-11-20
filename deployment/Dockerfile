@@ -19,8 +19,7 @@ COPY ./deployment/entrypoint.sh /etc/entrypoint.sh
 RUN chmod -R 777 storage bootstrap/cache \
  && php artisan config:cache \
  && php artisan route:cache \
- && php artisan event:cache \
- && composer dump-autoload -o
+ && php artisan event:cache
 
 EXPOSE 8080
 
