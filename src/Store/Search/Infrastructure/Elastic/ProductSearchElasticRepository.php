@@ -3,6 +3,7 @@
 namespace Src\Store\Search\Infrastructure\Elastic;
 
 use Src\Backoffice\Catalog\Infrastructure\Eloquent\Model\CategoryAttributeEloquentModel;
+use Src\Shared\Domain\ProductId;
 use Src\Shared\Domain\Response\Filters\FilterDefinitionList;
 use Src\Shared\Domain\Response\Filters\RangeFilterDefinition;
 use Src\Shared\Domain\Response\Filters\SelectFilterDefinition;
@@ -141,6 +142,37 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
         $response = $this->callElastic($this->buildQuery($dto));
 
         return $this->formatResponse($response, $dto);
+    }
+
+    public function getFilters(): FilterDefinitionList
+    {
+        /** @var ElasticsearchAggs $aggrs */
+        $aggrs = $this->callElastic([
+            'size' => 0,
+            'aggs' => $this->buildAggregations(),
+        ])['aggregations'] ?? [];
+
+        return $this->formatFilters(
+            $aggrs
+        );
+    }
+
+    public function get(ProductId $id): ?ProductResponse
+    {
+        $query = [
+            'query' => [
+                'term' => [
+                    'id' => (string) $id,
+                ],
+            ],
+            'size' => 1,
+        ];
+
+        $response = $this->callElastic($query);
+
+        $hit = $response['hits']['hits'][0]['_source'] ?? null;
+
+        return $hit ? ProductResponse::fromArray($hit) : null;
     }
 
     /**
@@ -310,20 +342,7 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
         return new FilterDefinitionList($filters);
     }
 
-    public function getFilters(): FilterDefinitionList
-    {
-        /** @var ElasticsearchAggs $aggrs */
-        $aggrs = $this->callElastic([
-            'size' => 0,
-            'aggs' => $this->buildAggregations(),
-        ])['aggregations'] ?? [];
-
-        return $this->formatFilters(
-            $aggrs
-        );
-    }
-
-    public function generateCursor(mixed $first): ?string
+    private function generateCursor(mixed $first): ?string
     {
         return $first ? base64_encode(json_encode($first, JSON_THROW_ON_ERROR)) : null;
     }

@@ -33,7 +33,6 @@ readonly class Product
             'category' => $this->category,
             'price' => $this->price,
             'description' => $this->description,
-            'attributes' => $this->attributes,
             'manufacturer' => $this->manufacturer,
             'created_at' => $this->createdAt->format(DATE_ATOM),
         ];
