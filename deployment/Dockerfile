@@ -5,8 +5,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 FROM php:8.3-fpm-alpine
 
-RUN pecl install redis
-
 RUN apk add --no-cache $PHPIZE_DEPS \
     && pecl install redis \
     && docker-php-ext-enable redis
