@@ -10,13 +10,11 @@ use Src\Store\Search\Domain\SearchProductsDto;
 
 /**
  * @property-read string|null $search
- * @property-read int|null $min_price
- * @property-read int|null $max_price
  * @property-read string|null $category
  * @property-read string|null $sort_by
  * @property-read string|null $sort_order
  * @property-read string|null $cursor
- * @property-read int|null $per_page
+ * @property-read string|null $per_page
  * @property-read null|array<string, string|mixed[]> $filters
  */
 class SearchProductRequest extends FormRequest
@@ -33,8 +31,6 @@ class SearchProductRequest extends FormRequest
     {
         return [
             'query' => ['nullable', 'string', 'max:255'],
-            'min_price' => ['nullable', 'numeric', 'min:0'],
-            'max_price' => ['nullable', 'numeric', 'min:0'],
             'category' => ['nullable', 'string', 'max:100'],
             'sort_by' => ['nullable', 'string', 'in:id,name.keyword,price,created_at'],
             'sort_order' => ['nullable', 'string', 'in:asc,desc'],
@@ -55,7 +51,7 @@ class SearchProductRequest extends FormRequest
             sortOrder: $this->sort_order ?? 'asc',
             cursor: $this->cursor,
             filters: Filters::fromArray($this->filters ?? []),
-            perPage: $this->per_page ?? 15,
+            perPage: (int) ($this->per_page ?? 15),
         );
     }
 }

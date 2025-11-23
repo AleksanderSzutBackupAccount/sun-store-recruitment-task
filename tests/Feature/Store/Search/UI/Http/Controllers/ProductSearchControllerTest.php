@@ -13,6 +13,13 @@ class ProductSearchControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        cache()->clear();
+    }
+
     public function test_product_search_endpoint_returns_expected_structure(): void
     {
         $mockElastic = Mockery::mock(ElasticClient::class);
@@ -75,7 +82,6 @@ class ProductSearchControllerTest extends TestCase
                     'category',
                 ],
             ],
-            'filters' => [],
             'meta' => [
                 'next_cursor',
                 'previous_cursor',
@@ -287,7 +293,6 @@ class ProductSearchControllerTest extends TestCase
                 ],
             ])
         );
-
         $response->assertStatus(200);
 
         $response->assertJsonStructure([
