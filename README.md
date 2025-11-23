@@ -1,5 +1,10 @@
 # Sun Store Backend – Technical Documentation
 
+## Links
+### Live Demo https://frontend-229302450163.europe-central2.run.app/
+### Frontend Repository https://github.com/AleksanderSzutBackupAccount/sun-store-frontend
+___
+
 ## Table of Contents
 1. [Overview](#1-overview)
 2. [Architecture](#2-architecture)
