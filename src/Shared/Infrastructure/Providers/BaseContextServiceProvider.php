@@ -8,6 +8,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Src\Shared\Application\Bus\Query\QueryInterface;
 use Src\Shared\Domain\Bus\CommandInterface;
 
 abstract class BaseContextServiceProvider extends ServiceProvider
@@ -23,7 +24,7 @@ abstract class BaseContextServiceProvider extends ServiceProvider
     protected array $binds = [];
 
     /**
-     * @var array<class-string<CommandInterface>, class-string>
+     * @var array<class-string<CommandInterface>|class-string<QueryInterface<mixed>>, class-string>
      */
     protected array $useCases = [];
 

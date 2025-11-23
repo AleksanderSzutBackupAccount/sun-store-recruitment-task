@@ -4,19 +4,17 @@ namespace Src\Store\Search\UI\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Src\Store\Search\Domain\ProductSearchRepository;
-use Src\Store\Search\UI\Http\Requests\SearchProductRequest;
+use Src\Shared\Application\Bus\Query\QueryBusInterface;
+use Src\Store\Search\Application\UseCases\Filters\ProductFiltersQuery;
 
 class ProductFilterController extends Controller
 {
     public function __construct(
-        private readonly ProductSearchRepository $repository
+        private readonly QueryBusInterface $bus
     ) {}
 
-    public function __invoke(SearchProductRequest $request): JsonResponse
+    public function __invoke(): JsonResponse
     {
-        $result = $this->repository->getFilters();
-
-        return response()->json($result->toResponse());
+        return response()->json($this->bus->ask(new ProductFiltersQuery)->toResponse());
     }
 }

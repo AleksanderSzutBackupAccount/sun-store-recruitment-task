@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace Src\Store\Search\Application\UseCases\Search;
 
-use Src\Store\Search\Domain\ProductSearchRepository;
+use Src\Shared\Application\Bus\Query\CacheableQueryInterface;
 use Src\Store\Search\Domain\Response\ProductSearchPaginatedResponse;
 use Src\Store\Search\Domain\SearchProductsDto;
 
-final readonly class ProductSearchQuery
+/**
+ * @implements CacheableQueryInterface<ProductSearchPaginatedResponse>
+ */
+final readonly class ProductSearchQuery implements CacheableQueryInterface
 {
-    public function __construct(private ProductSearchRepository $repository) {}
+    public function __construct(public SearchProductsDto $dto) {}
 
-    public function handle(SearchProductsDto $dto): ProductSearchPaginatedResponse
+    public function cacheKey(): string
     {
-        return $this->repository->search($dto);
+        return 'product_search_'.$this->dto->getHash();
+    }
+
+    public function ttl(): int
+    {
+        return 300;
     }
 }

@@ -17,4 +17,9 @@ final readonly class SearchProductsDto
         public Filters $filters,
         public int $perPage = 15
     ) {}
+
+    public function getHash(): string
+    {
+        return md5(json_encode($this, JSON_THROW_ON_ERROR));
+    }
 }

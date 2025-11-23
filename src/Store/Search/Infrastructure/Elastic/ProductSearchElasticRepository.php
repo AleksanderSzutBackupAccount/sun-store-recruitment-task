@@ -200,8 +200,6 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
             $must[] = $this->buildFilterClause($filter);
         }
 
-        $aggs = $this->buildAggregations();
-
         $query = [
             'query' => ['bool' => ['must' => $must]],
             'size' => $dto->perPage,
@@ -209,7 +207,6 @@ final class ProductSearchElasticRepository implements ProductSearchRepository
                 [$dto->sortBy => ['order' => $dto->sortOrder]],
                 ['id' => ['order' => $dto->sortOrder]],
             ],
-            'aggs' => $aggs,
         ];
 
         if ($dto->cursor) {
