@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Src\Backoffice\Catalog\Infrastructure\Eloquent\Repositories;
 
 use Src\Backoffice\Catalog\Domain\Category\CategoryAttribute;

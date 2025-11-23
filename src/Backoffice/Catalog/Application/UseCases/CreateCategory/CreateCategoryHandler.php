@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Src\Backoffice\Catalog\Application\UseCases\CreateCategory;
 
 use Src\Backoffice\Catalog\Domain\Category\CategoryName;

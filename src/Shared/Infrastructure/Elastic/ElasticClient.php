@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Src\Shared\Infrastructure\Elastic;
 
 use Elastic\Elasticsearch\Client;

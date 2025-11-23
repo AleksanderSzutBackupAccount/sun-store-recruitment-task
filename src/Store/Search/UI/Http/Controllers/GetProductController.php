@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Src\Store\Search\UI\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -18,7 +20,7 @@ class GetProductController extends Controller
     public function __invoke(string $id): JsonResponse
     {
         try {
-            $product = $this->queryBus->ask(new ProductGetQuery(new ProductId($id)));
+            $product = $this->queryBus->ask(new ProductGetQuery($id));
         } catch (ProductNotFound $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         }

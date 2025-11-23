@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Src\Shared\Domain\Response;
 
 use Src\Shared\Domain\Response\Filters\FilterDefinitionList;
