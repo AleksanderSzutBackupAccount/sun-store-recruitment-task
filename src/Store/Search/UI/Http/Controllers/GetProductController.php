@@ -7,7 +7,6 @@ namespace Src\Store\Search\UI\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Src\Shared\Application\Bus\Query\QueryBusInterface;
-use Src\Shared\Domain\ProductId;
 use Src\Store\Search\Application\UseCases\Get\ProductGetQuery;
 use Src\Store\Search\Domain\Exceptions\ProductNotFound;
 
