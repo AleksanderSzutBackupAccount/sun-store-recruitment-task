@@ -5,8 +5,10 @@ RUN composer install --no-dev --optimize-autoloader
 
 FROM php:8.3-fpm-alpine
 
+RUN pecl install redis
+
 RUN apk add --no-cache nginx supervisor libpng-dev libzip-dev zip git curl bash \
-    && docker-php-ext-install pdo pdo_mysql zip gd
+    && docker-php-ext-install pdo pdo_mysql zip gd redis
 
 WORKDIR /var/www/html
 COPY . .
